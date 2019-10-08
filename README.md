@@ -2,6 +2,10 @@
 
 This project enables _automagic_ firing of [PropertyChanged][1] events. It's perfect for view models.
 
+## NuGet
+
+The binaries from this repository are available as the [Iftm.ComputedProperties][5] NuGet packge.
+
 ## Example
 
 Say you have a property A, and a property B that is evaluated as A + 5. To have the [PropertyChanged][1] event fired for both A and B whenever A changes, simply inherit from WithComputedProperties like this:
@@ -49,3 +53,5 @@ Iftm.ComputedProperties blows frameworks like [ReactiveUI][2] out of the water b
 [3]: https://docs.microsoft.com/en-us/dotnet/api/system.idisposable.dispose?view=netframework-4.8#System_IDisposable_Dispose
 
 [4]: https://github.com/dotnet/wpf
+
+[5]: https://www.nuget.org/packages/Iftm.ComputedProperties/
