@@ -6,6 +6,23 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageIcon>Icon.png</PackageIcon>
+    <Authors>Dejan Jelovic</Authors>
+    <Title>Iftm.ComputedProperties</Title>
+    <Description>Automatic computed property firing of PropertyChanged events.</Description>
+    <Copyright>Copyright &#169; 2019 Dejan Jelovic</Copyright>
+    <ProjectUrl>https://github.com/djelovic/Iftm.ComputedProperties/blob/master/README.md</ProjectUrl>
+    <RepositoryUrl>https://github.com/djelovic/Iftm.ComputedProperties</RepositoryUrl>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="Icon.png" Pack="True" PackagePath="/"/>
+  </ItemGroup>
+  
   <ItemGroup>
     <PackageReference Include="System.Memory" Version="4.5.3" />
   </ItemGroup>
