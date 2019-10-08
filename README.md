@@ -32,7 +32,7 @@ class Demo : WithComputedProperties
 ```
 The magic of this is that whenever A changes, the [PropertyChanged][1] event will be fired for both A and B.
 
-This also works for complex properties like a.B.C.D where a, B and C are objects, the property computation is a conditional expressions, etc.
+This also works for property chains like a.B.C.D where a, B and C are objects, the property computation is a conditional expressions, etc.
 
 ## Lifetime
 
