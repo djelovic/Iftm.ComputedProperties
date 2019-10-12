@@ -7,10 +7,12 @@ using System.Runtime.CompilerServices;
 
 namespace Iftm.ComputedProperties {
 
+    /// <summary>
+    /// A base class for automatic firing of <see cref="PropertyChanged"/> events for computed properties
+    /// when any inputs change.
+    /// </summary>
     public abstract class WithComputedProperties : INotifyPropertyChanged, IDependenciesTarget, IDisposable {
         private PropertyChangedEventHandler? _propertyChanged;
-
-        private static PropertyChangedEventArgs? _allPropertiesEventArgs;
 
         [ThreadStatic] private static Dictionary<string, PropertyChangedEventArgs>? _nameToArgs;
         [ThreadStatic] private static InPlaceList<string> _changedProperties;
@@ -25,6 +27,15 @@ namespace Iftm.ComputedProperties {
 
         private InPlaceList<Dependency> _dependencies;
 
+        /// <summary>
+        /// Compares the <paramref name="destination"/> to the <paramref name="source"/>, and they are different copies the
+        /// <paramref name="source"/> to the <paramref name="destination"/> and fires the
+        /// <see cref="PropertyChanged"/> event for the property <paramref name="name"/>.
+        /// </summary>
+        /// <typeparam name="T">Type of the property</typeparam>
+        /// <param name="destination">Destination.</param>
+        /// <param name="source">Source.</param>
+        /// <param name="name">Name of the property being set.</param>
         protected void SetProperty<T>(ref T destination, T source, [CallerMemberName] string? name = null) {
             if (name == null) throw new ArgumentNullException(nameof(name));
 
@@ -34,6 +45,14 @@ namespace Iftm.ComputedProperties {
             OnPropertyChanged(name);
         }
 
+
+        /// <summary>
+        /// Creates a <see cref="ComputedProperty{TObj, TResult}"/> from the input <paramref name="expression"/>.
+        /// </summary>
+        /// <typeparam name="TObj">Class that contains the property.</typeparam>
+        /// <typeparam name="TResult">Type of the property.</typeparam>
+        /// <param name="expression">Expression that computes the property.</param>
+        /// <returns></returns>
         protected static ComputedProperty<TObj, TResult> Computed<TObj, TResult>(Expression<Func<TObj, TResult>> expression) =>
             new ComputedProperty<TObj, TResult>(expression);
 
@@ -66,12 +85,16 @@ namespace Iftm.ComputedProperties {
             }
         }
 
+        /// <summary>
+        /// Fires the <see cref="PropertyChanged"/> for the property <paramref name="name"/> and all the
+        /// properties that depend on it.
+        /// </summary>
+        /// <param name="name"></param>
         protected void OnPropertyChanged(string? name) {
             if (_propertyChanged == null) return;
 
             if (name == null) {
-                if (_allPropertiesEventArgs == null) _allPropertiesEventArgs = new PropertyChangedEventArgs(null);
-                _propertyChanged.Invoke(this, _allPropertiesEventArgs);
+                _propertyChanged.Invoke(this, AllPropertiesChanged.EventArgs);
             }
             else {
                 ref var properties = ref _changedProperties;
@@ -118,7 +141,11 @@ namespace Iftm.ComputedProperties {
             }
         }
 
-        private void SubscribeToInputEvents() {
+        /// <summary>
+        /// Called when the last <see cref="PropertyChanged"/> listener is detached. Detaches from the computed
+        /// properties for the objects this object depends on.
+        /// </summary>
+        protected virtual void OnListenersDetached() {
             for (int x = 0; x < _dependencies.Count; ++x) {
                 var source = _dependencies[x].Source;
                 if (source == null) continue;
@@ -136,7 +163,10 @@ namespace Iftm.ComputedProperties {
             }
         }
 
-        private void UnsubscribeFromInputEvents() {
+        /// <summary>
+        /// Calls when the first listener to the <see cref="PropertyChanged"/> event is attached.
+        /// </summary>
+        protected virtual void OnListenersAttached() {
             for (int x = 0; x < _dependencies.Count; ++x) {
                 var source = _dependencies[x].Source;
                 if (source == null) continue;
@@ -154,18 +184,21 @@ namespace Iftm.ComputedProperties {
             }
         }
 
+        /// <summary>
+        /// Fired when any of the properties of this object are changed.
+        /// </summary>
         public event PropertyChangedEventHandler PropertyChanged {
             add {
                 bool wasNull = _propertyChanged == null;
                 _propertyChanged += value ?? throw new ArgumentNullException(nameof(value));
 
-                if (wasNull) SubscribeToInputEvents();
+                if (wasNull) OnListenersDetached();
             }
             remove {
                 if (_propertyChanged == null) return;
 
                 _propertyChanged -= value ?? throw new ArgumentNullException(nameof(value));
-                if (_propertyChanged == null) UnsubscribeFromInputEvents();
+                if (_propertyChanged == null) OnListenersAttached();
             }
         }
 
@@ -324,12 +357,19 @@ namespace Iftm.ComputedProperties {
             }
         }
 
+        /// <summary>
+        /// True if the <see cref="PropertyChanged"/> event has any listeners.
+        /// </summary>
         public bool HasListeners => _propertyChanged != null;
 
+        /// <summary>
+        /// Clears the list of <see cref="PropertyChanged"/> listeners and detaches
+        /// from any input objects.
+        /// </summary>
         public virtual void Dispose() {
             if (_propertyChanged != null) {
-                UnsubscribeFromInputEvents();
                 _propertyChanged = null;
+                OnListenersAttached();
             }
         }
     }
