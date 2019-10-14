@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Iftm.ComputedProperties.WpfDemo {
 
-    public class NuGetSearchModel : WithComputedProperties {
+    public class NuGetSearchModel : WithStoredComputedProperties {
         private string _searchString = "";
 
         public string SearchString {
@@ -32,16 +32,18 @@ namespace Iftm.ComputedProperties.WpfDemo {
             var filter = new SearchFilter(false);
             var resource = await source.GetResourceAsync<PackageSearchResource>().ConfigureAwait(false);
             var metadata = await resource.SearchAsync(searchString, filter, 0, 10, null, ct).ConfigureAwait(false);
-            return metadata.ToList();
+            var ret = metadata.ToList();
+            return ret;
         }
 
-        private static ComputedProperty<NuGetSearchModel, TaskPropertyChanged<IReadOnlyList<IPackageSearchMetadata>>> _nuGetSearchResults =
-            Computed(
-                (NuGetSearchModel model) => TaskPropertyChanged.Create(model.SearchString, (searchString, ct) => SearchNuGetAsync(searchString, ct))
-            );
+        private static ComputedProperty<NuGetSearchModel, TaskModel<IReadOnlyList<IPackageSearchMetadata>>> _search = Computed(
+            (NuGetSearchModel model) => TaskPropertyChanged.Create(model.SearchString, (searchString, ct) => SearchNuGetAsync(searchString, ct)));
 
-        public TaskPropertyChanged<IReadOnlyList<IPackageSearchMetadata>> NuGetSearchResults =>
-            _nuGetSearchResults.Eval(this);
+        private StoredComputedProperty<NuGetSearchModel, TaskModel<IReadOnlyList<IPackageSearchMetadata>>> _searchResults =
+            _search.Stored;
+
+        public TaskModel<IReadOnlyList<IPackageSearchMetadata>> SearchResults =>
+            _searchResults.Eval(this);
     }
 
 }

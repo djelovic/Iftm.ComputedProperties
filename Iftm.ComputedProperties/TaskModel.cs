@@ -29,7 +29,7 @@ namespace Iftm.ComputedProperties {
     /// </para>
     /// </summary>
     /// <typeparam name="T">Type that the function returns.</typeparam>
-    public class TaskPropertyChanged<T> : INotifyPropertyChanged, IDisposable {
+    public class TaskModel<T> : INotifyPropertyChanged, IDisposable {
         private Func<CancellationToken, ValueTask<T>>? _factory;
         private T _value;
         private Exception? _exception;
@@ -43,7 +43,7 @@ namespace Iftm.ComputedProperties {
         /// <param name="factory">The function that given a <see cref="CancellationToken"/> returns
         /// a <see cref="ValueTask&lt<see cref="T"/>"/>&gt; whose result we are interested in.</param>
         #pragma warning disable 8618
-        public TaskPropertyChanged(Func<CancellationToken, ValueTask<T>> factory) {
+        public TaskModel(Func<CancellationToken, ValueTask<T>> factory) {
             _factory = factory ?? throw new ArgumentNullException(nameof(factory));
         }
         #pragma warning restore 8618
@@ -140,10 +140,10 @@ namespace Iftm.ComputedProperties {
     }
 
     public static class TaskPropertyChanged {
-        public static TaskPropertyChanged<T> Create<T>(Func<CancellationToken, ValueTask<T>> factory) =>
-            new TaskPropertyChanged<T>(factory);
+        public static TaskModel<T> Create<T>(Func<CancellationToken, ValueTask<T>> factory) =>
+            new TaskModel<T>(factory);
 
-        public static TaskPropertyChanged<T> Create<Args, T>(Args args, Func<Args, CancellationToken, ValueTask<T>> factory) =>
-            new TaskPropertyChanged<T>(ct => factory(args, ct));
+        public static TaskModel<T> Create<Args, T>(Args args, Func<Args, CancellationToken, ValueTask<T>> factory) =>
+            new TaskModel<T>(ct => factory(args, ct));
     }
 }

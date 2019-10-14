@@ -52,20 +52,22 @@ namespace Iftm.ComputedProperties {
             --_count;
         }
 
-        public bool Contains(T val, int index, int count) {
-            if (count < 0) throw new ArgumentOutOfRangeException(nameof(count));
-            if ((uint)index > (uint)_count) throw new IndexOutOfRangeException();
-            if (index + count > _count) throw new ArgumentOutOfRangeException(nameof(count));
-
+        public int IndexOf(in T val, int index, int count) {
             var cmp = EqualityComparer<T>.Default;
-            for (int x = index; x < count; ++x) {
-                if (cmp.Equals(_arr![x], val)) return true;
+
+            var span = AsReadOnlySpan(index, count);
+            for (int x = 0; x < span.Length; ++x) {
+                if (cmp.Equals(span[x], val)) return index + x;
             }
 
-            return false;
+            return -1;
         }
 
-        public bool Contains(T val) => Contains(val, 0, _count);
+        public int IndexOf(in T val) => IndexOf(val, 0, _count);
+
+        public bool Contains(in T val, int index, int count) => IndexOf(val, index, count) >= 0;
+
+        public bool Contains(in T val) => Contains(val, 0, _count);
 
         public ReadOnlySpan<T> AsReadOnlySpan(int start, int length) {
             if (length < 0) throw new ArgumentOutOfRangeException(nameof(length));

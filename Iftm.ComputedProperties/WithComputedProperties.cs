@@ -332,7 +332,7 @@ namespace Iftm.ComputedProperties {
             RemoveIndices(ref dependencies, toRemove);
         }
 
-        void IDependenciesTarget.SetDependencies(string targetProperty, List<(INotifyPropertyChanged Source, string Property, int Cookie)> input, int cookie) {
+        public virtual void SetDependencies(string targetProperty, List<(INotifyPropertyChanged Source, string Property, int Cookie)> input, int cookie) {
             int inputIndex = -1;
             IncrementInputIndex(ref inputIndex, input, cookie);
 

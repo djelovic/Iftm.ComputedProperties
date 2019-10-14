@@ -15,7 +15,7 @@ namespace Iftm.ComputedProperties.Test {
         [Fact]
         public void TestSimple() {
             Func<CancellationToken, ValueTask<int>> factory = ct => new ValueTask<int>(5);
-            var tpc = new TaskPropertyChanged<int>(factory);
+            var tpc = new TaskModel<int>(factory);
 
             void OnPropertyChanged(object sender, PropertyChangedEventArgs args) {
             }
