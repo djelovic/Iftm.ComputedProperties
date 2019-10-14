@@ -142,5 +142,8 @@ namespace Iftm.ComputedProperties {
     public static class TaskPropertyChanged {
         public static TaskPropertyChanged<T> Create<T>(Func<CancellationToken, ValueTask<T>> factory) =>
             new TaskPropertyChanged<T>(factory);
+
+        public static TaskPropertyChanged<T> Create<Args, T>(Args args, Func<Args, CancellationToken, ValueTask<T>> factory) =>
+            new TaskPropertyChanged<T>(ct => factory(args, ct));
     }
 }

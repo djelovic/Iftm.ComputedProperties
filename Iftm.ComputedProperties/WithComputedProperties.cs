@@ -42,7 +42,7 @@ namespace Iftm.ComputedProperties {
             if (EqualityComparer<T>.Default.Equals(destination, source)) return;
 
             destination = source;
-            OnPropertyChanged(name);
+            OnMyPropertyChanged(name);
         }
 
 
@@ -69,13 +69,17 @@ namespace Iftm.ComputedProperties {
             }
         }
 
-        private void FirePropertyChanged(ReadOnlySpan<string> names) {
+        protected virtual void OnPropertyChanged(string? name) {
             Debug.Assert(_propertyChanged != null);
+            if (_propertyChanged == null) return;
 
-            if (_nameToArgs == null) _nameToArgs = new Dictionary<string, PropertyChangedEventArgs>();
-            var nameToArgs = _nameToArgs;
+            if (name == null) {
+                _propertyChanged.Invoke(this, AllPropertiesChanged.EventArgs);
+            }
+            else {
+                if (_nameToArgs == null) _nameToArgs = new Dictionary<string, PropertyChangedEventArgs>();
+                var nameToArgs = _nameToArgs;
 
-            foreach (var name in names) {
                 if (!nameToArgs.TryGetValue(name, out var args)) {
                     args = new PropertyChangedEventArgs(name);
                     nameToArgs.Add(name, args);
@@ -85,16 +89,13 @@ namespace Iftm.ComputedProperties {
             }
         }
 
-        /// <summary>
-        /// Fires the <see cref="PropertyChanged"/> for the property <paramref name="name"/> and all the
-        /// properties that depend on it.
-        /// </summary>
-        /// <param name="name"></param>
-        protected void OnPropertyChanged(string? name) {
-            if (_propertyChanged == null) return;
+        private void FirePropertyChanged(ReadOnlySpan<string> names) {
+            foreach (var name in names) OnPropertyChanged(name);
+        }
 
+        private void OnMyPropertyChanged(string? name) {
             if (name == null) {
-                _propertyChanged.Invoke(this, AllPropertiesChanged.EventArgs);
+                OnPropertyChanged(null);
             }
             else {
                 ref var properties = ref _changedProperties;
@@ -145,7 +146,7 @@ namespace Iftm.ComputedProperties {
         /// Called when the last <see cref="PropertyChanged"/> listener is detached. Detaches from the computed
         /// properties for the objects this object depends on.
         /// </summary>
-        protected virtual void OnListenersDetached() {
+        protected virtual void OnListenersAttached() {
             for (int x = 0; x < _dependencies.Count; ++x) {
                 var source = _dependencies[x].Source;
                 if (source == null) continue;
@@ -166,7 +167,7 @@ namespace Iftm.ComputedProperties {
         /// <summary>
         /// Calls when the first listener to the <see cref="PropertyChanged"/> event is attached.
         /// </summary>
-        protected virtual void OnListenersAttached() {
+        protected virtual void OnListenersDetached() {
             for (int x = 0; x < _dependencies.Count; ++x) {
                 var source = _dependencies[x].Source;
                 if (source == null) continue;
@@ -192,13 +193,13 @@ namespace Iftm.ComputedProperties {
                 bool wasNull = _propertyChanged == null;
                 _propertyChanged += value ?? throw new ArgumentNullException(nameof(value));
 
-                if (wasNull) OnListenersDetached();
+                if (wasNull) OnListenersAttached();
             }
             remove {
                 if (_propertyChanged == null) return;
 
                 _propertyChanged -= value ?? throw new ArgumentNullException(nameof(value));
-                if (_propertyChanged == null) OnListenersAttached();
+                if (_propertyChanged == null) OnListenersDetached();
             }
         }
 
@@ -369,7 +370,7 @@ namespace Iftm.ComputedProperties {
         public virtual void Dispose() {
             if (_propertyChanged != null) {
                 _propertyChanged = null;
-                OnListenersAttached();
+                OnListenersDetached();
             }
         }
     }

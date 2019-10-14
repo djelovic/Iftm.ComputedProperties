@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="zbdi5b5f.jfe~" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="NuGet.Client" Version="4.2.0" />
+    <PackageReference Include="NuGet.Protocol.Core.Types" Version="4.2.0" />
+    <PackageReference Include="NuGet.Protocol.Core.v3" Version="4.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Iftm.ComputedProperties\Iftm.ComputedProperties.csproj" />
+  </ItemGroup>
+
+</Project>
