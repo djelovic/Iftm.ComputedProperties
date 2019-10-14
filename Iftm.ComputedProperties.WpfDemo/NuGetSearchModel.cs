@@ -37,7 +37,7 @@ namespace Iftm.ComputedProperties.WpfDemo {
         }
 
         private static ComputedProperty<NuGetSearchModel, TaskModel<IReadOnlyList<IPackageSearchMetadata>>> _search = Computed(
-            (NuGetSearchModel model) => TaskPropertyChanged.Create(model.SearchString, (searchString, ct) => SearchNuGetAsync(searchString, ct)));
+            (NuGetSearchModel model) => TaskModel.Create(model.SearchString, (searchString, ct) => SearchNuGetAsync(searchString, ct)));
 
         private StoredComputedProperty<NuGetSearchModel, TaskModel<IReadOnlyList<IPackageSearchMetadata>>> _searchResults =
             _search.Stored;

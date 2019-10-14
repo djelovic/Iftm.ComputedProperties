@@ -139,11 +139,20 @@ namespace Iftm.ComputedProperties {
         }
     }
 
-    public static class TaskPropertyChanged {
+    public static class TaskModel {
         public static TaskModel<T> Create<T>(Func<CancellationToken, ValueTask<T>> factory) =>
             new TaskModel<T>(factory);
 
-        public static TaskModel<T> Create<Args, T>(Args args, Func<Args, CancellationToken, ValueTask<T>> factory) =>
-            new TaskModel<T>(ct => factory(args, ct));
+        public static TaskModel<T> Create<Arg, T>(Arg arg, Func<Arg, CancellationToken, ValueTask<T>> factory) =>
+            new TaskModel<T>(ct => factory(arg, ct));
+
+        public static TaskModel<T> Create<Arg1, Arg2, T>(Arg1 arg1, Arg2 arg2, Func<Arg1, Arg2, CancellationToken, ValueTask<T>> factory) =>
+            new TaskModel<T>(ct => factory(arg1, arg2, ct));
+
+        public static TaskModel<T> Create<Arg1, Arg2, Arg3, T>(Arg1 arg1, Arg2 arg2, Arg3 arg3, Func<Arg1, Arg2, Arg3, CancellationToken, ValueTask<T>> factory) =>
+            new TaskModel<T>(ct => factory(arg1, arg2, arg3, ct));
+
+        public static TaskModel<T> Create<Arg1, Arg2, Arg3, Arg4, T>(Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4, Func<Arg1, Arg2, Arg3, Arg4, CancellationToken, ValueTask<T>> factory) =>
+            new TaskModel<T>(ct => factory(arg1, arg2, arg3, arg4, ct));
     }
 }

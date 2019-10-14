@@ -48,7 +48,7 @@ namespace Iftm.ComputedProperties.Test {
                 gotResult.Release();
             }
 
-            var tpc = TaskPropertyChanged.Create(factory);
+            var tpc = TaskModel.Create(factory);
 
             Assert.False(tpc.HasValue);
             Assert.Equal(0, tpc.Value);
@@ -82,7 +82,7 @@ namespace Iftm.ComputedProperties.Test {
                 gotResult.Release();
             }
 
-            var tpc = TaskPropertyChanged.Create(factory);
+            var tpc = TaskModel.Create(factory);
 
             Assert.False(tpc.HasValue);
             Assert.Equal(0, tpc.Value);
