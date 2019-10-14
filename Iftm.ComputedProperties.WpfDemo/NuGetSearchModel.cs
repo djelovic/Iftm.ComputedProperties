@@ -18,7 +18,7 @@ namespace Iftm.ComputedProperties.WpfDemo {
             set => SetProperty(ref _searchString, value);
         }
 
-        private static async ValueTask<IReadOnlyList<IPackageSearchMetadata>> SearchNuGetAsync(string searchString, CancellationToken ct) {
+        private static async ValueTask<IReadOnlyList<IPackageSearchMetadata>> SearchAsync(string searchString, CancellationToken ct) {
             searchString = searchString.Trim();
             if (searchString == "") return Array.Empty<IPackageSearchMetadata>();
 
@@ -37,7 +37,7 @@ namespace Iftm.ComputedProperties.WpfDemo {
         }
 
         private static ComputedProperty<NuGetSearchModel, TaskModel<IReadOnlyList<IPackageSearchMetadata>>> _search = Computed(
-            (NuGetSearchModel model) => TaskModel.Create(model.SearchString, (searchString, ct) => SearchNuGetAsync(searchString, ct)));
+            (NuGetSearchModel model) => TaskModel.Create(model.SearchString, (searchString, ct) => SearchAsync(searchString, ct)));
 
         private StoredComputedProperty<NuGetSearchModel, TaskModel<IReadOnlyList<IPackageSearchMetadata>>> _searchResults =
             _search.Stored;
