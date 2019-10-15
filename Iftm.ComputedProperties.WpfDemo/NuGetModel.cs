@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Iftm.ComputedProperties.WpfDemo {
 
-    public class NuGetSearchModel : WithStoredComputedProperties {
+    public class NuGetModel : WithStoredComputedProperties {
         private string _searchString = "";
 
         public string SearchString {
@@ -36,10 +36,11 @@ namespace Iftm.ComputedProperties.WpfDemo {
             return ret;
         }
 
-        private static ComputedProperty<NuGetSearchModel, TaskModel<IReadOnlyList<IPackageSearchMetadata>>> _search = Computed(
-            (NuGetSearchModel model) => TaskModel.Create(model.SearchString, (searchString, ct) => SearchAsync(searchString, ct)));
+        private static AsyncProperty<NuGetModel, IReadOnlyList<IPackageSearchMetadata>> _search = Computed(
+            (NuGetModel model) => Call(model.SearchString, SearchAsync)
+        );
 
-        private StoredComputedProperty<NuGetSearchModel, TaskModel<IReadOnlyList<IPackageSearchMetadata>>> _searchResults =
+        private StoredAsyncProperty<NuGetModel, IReadOnlyList<IPackageSearchMetadata>> _searchResults =
             _search.Stored;
 
         public TaskModel<IReadOnlyList<IPackageSearchMetadata>> SearchResults =>

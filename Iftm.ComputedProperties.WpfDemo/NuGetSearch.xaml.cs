@@ -21,7 +21,7 @@ namespace Iftm.ComputedProperties.WpfDemo {
         public NuGetSearch() {
             InitializeComponent();
 
-            DataContext = new NuGetSearchModel();
+            DataContext = new NuGetModel();
         }
     }
 }

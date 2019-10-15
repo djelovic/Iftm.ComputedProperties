@@ -42,14 +42,31 @@ namespace Iftm.ComputedProperties {
         }
 
         private class Visitor : ExpressionVisitor {
+            private readonly LambdaVisitor _lambdaVisitor = new LambdaVisitor();
+
+            protected override Expression VisitLambda<T>(Expression<T> node) {
+                return _lambdaVisitor.Visit(node);
+            }
+
             protected override Expression VisitMember(MemberExpression node) {
                 var expression = Visit(node.Expression);
+
                 if (node.Member is PropertyInfo && typeof(INotifyPropertyChanged).IsAssignableFrom(expression.Type) && !expression.Type.IsValueType) {
                     var addMethod = _addMethod!.MakeGenericMethod(expression.Type);
                     return Expression.MakeMemberAccess(Expression.Call(_dependenciesParameter, addMethod, expression, Expression.Constant(node.Member.Name)), node.Member);
                 }
                 else {
                     return node.Expression == expression ? node : Expression.MakeMemberAccess(expression, node.Member);
+                }
+            }
+
+            private class LambdaVisitor : ExpressionVisitor {
+                protected override Expression VisitMember(MemberExpression node) {
+                    if (node.Member is PropertyInfo && typeof(INotifyPropertyChanged).IsAssignableFrom(node.Expression.Type) && !node.Expression.Type.IsValueType) {
+                        throw new ArgumentException($"Unable to read the property {node.Expression.Type.Name}.{node.Member.Name} inside a nested labda, please lift it to the top-level expression.");
+                    }
+
+                    return base.VisitMember(node);
                 }
             }
         }
