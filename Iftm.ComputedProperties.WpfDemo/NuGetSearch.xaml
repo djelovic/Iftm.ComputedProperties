@@ -10,19 +10,22 @@
         Title="MainWindow" Height="450" Width="800">
     <DockPanel LastChildFill="True">
         <TextBox DockPanel.Dock="Top" Text="{Binding SearchString, UpdateSourceTrigger=PropertyChanged}" x:Name="_searchText" Margin="10" Padding="4"/>
-        <ListBox ItemsSource="{Binding SearchResults.Value}" Margin="10 0 10 10">
-            <ListBox.ItemTemplate>
-                <DataTemplate DataType="{x:Type nuget:IPackageSearchMetadata}">
-                    <DockPanel LastChildFill="True" Margin="10">
-                        <Image Width="32" Height="32" Source="{Binding IconUrl}" Margin="0 0 10 0" DockPanel.Dock="Left" VerticalAlignment="Top"/>
-                        <TextBlock>
-                            <Run FontWeight="SemiBold" FontSize="14" Text="{Binding Title}"/> by <Run Text="{Binding Authors}"/>, <Run FontWeight="SemiBold" Text="{Binding DownloadCount}"/> downloads
-                            <LineBreak/>
-                            <Run Text="{Binding Description}"/>
-                        </TextBlock>
-                    </DockPanel>
-                </DataTemplate>
-            </ListBox.ItemTemplate>
-        </ListBox>
+        <Grid Margin="10 0 10 10">
+            <ListBox ItemsSource="{Binding SearchResults.Value}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate DataType="{x:Type nuget:IPackageSearchMetadata}">
+                        <DockPanel LastChildFill="True" Margin="10">
+                            <Image Width="32" Height="32" Source="{Binding IconUrl}" Margin="0 0 10 0" DockPanel.Dock="Left" VerticalAlignment="Top"/>
+                            <TextBlock>
+                                <Run FontWeight="SemiBold" FontSize="14" Text="{Binding Title}"/> by <Run Text="{Binding Authors}"/>, <Run FontWeight="SemiBold" Text="{Binding DownloadCount}"/> downloads
+                                <LineBreak/>
+                                <Run Text="{Binding Description}"/>
+                            </TextBlock>
+                        </DockPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+            <ProgressBar IsIndeterminate="True" Height="2" VerticalAlignment="Top" Visibility="{Binding SearchProgressVisibility}" Foreground="DeepSkyBlue" Background="Transparent" BorderThickness="0"/>
+        </Grid>
     </DockPanel>
 </Window>

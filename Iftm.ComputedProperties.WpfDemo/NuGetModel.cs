@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace Iftm.ComputedProperties.WpfDemo {
 
@@ -45,6 +46,12 @@ namespace Iftm.ComputedProperties.WpfDemo {
 
         public TaskModel<IReadOnlyList<IPackageSearchMetadata>> SearchResults =>
             _searchResults.Eval(this);
+
+        private static ComputedProperty<NuGetModel, Visibility> _searchProgressVisibility = Computed(
+            (NuGetModel model) => model.SearchResults.HasValue ? Visibility.Hidden : Visibility.Visible
+        );
+
+        public Visibility SearchProgressVisibility => _searchProgressVisibility.Eval(this);
     }
 
 }
