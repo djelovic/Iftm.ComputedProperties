@@ -24,49 +24,6 @@ namespace Iftm.ComputedProperties {
             var collection = new DependencyCollection(dependencies, cookie);
             return _func(obj, ref collection);
         }
-
-        public StoredComputedProperty<TObj, TResult> Stored => new StoredComputedProperty<TObj, TResult>(_func);
-    }
-
-    public struct StoredComputedProperty<TObj, TResult> {
-        private readonly ComputeAndCollectDependencies<TObj, TResult> _func;
-        private TResult _value;
-        private Exception? _exception;
-
-        internal StoredComputedProperty(ComputeAndCollectDependencies<TObj, TResult> func) {
-            _func = func;
-            #pragma warning disable 8653
-            _value = default;
-            #pragma warning restore 8653
-            _exception = null;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public TResult CallAndGetDependencies(TObj obj, List<(INotifyPropertyChanged Source, string Property, int Cookie)> dependencies, int cookie) {
-            var collection = new DependencyCollection(dependencies, cookie);
-            try {
-                var val = _func(obj, ref collection);
-                _value = val;
-                _exception = null;
-                return val;
-            }
-            catch (Exception e) {
-                _exception = e;
-                #pragma warning disable 8653
-                _value = default;
-                #pragma warning restore 8653
-
-                ExceptionDispatchInfo.Capture(e).Throw();
-                throw;
-            }
-        }
-
-        public TResult Value {
-            get {
-                if (_exception != null) ExceptionDispatchInfo.Capture(_exception).Throw();
-                return _value;
-            }
-        }
     }
 
     public struct AsyncProperty<TObj, TResult> {
@@ -81,54 +38,15 @@ namespace Iftm.ComputedProperties {
             var collection = new DependencyCollection(dependencies, cookie);
             return TaskModel.Create(_func(obj, ref collection));
         }
-
-        public StoredAsyncProperty<TObj, TResult> Stored => new StoredAsyncProperty<TObj, TResult>(_func);
     }
-
-    public struct StoredAsyncProperty<TObj, TResult> {
-        private readonly ComputeAndCollectDependencies<TObj, Func<CancellationToken, ValueTask<TResult>>> _func;
-        private TaskModel<TResult>? _value;
-        private Exception? _exception;
-
-        internal StoredAsyncProperty(ComputeAndCollectDependencies<TObj, Func<CancellationToken, ValueTask<TResult>>> func) {
-            _func = func;
-            _value = null;
-            _exception = null;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public TaskModel<TResult> CallAndGetDependencies(TObj obj, List<(INotifyPropertyChanged Source, string Property, int Cookie)> dependencies, int cookie) {
-            var collection = new DependencyCollection(dependencies, cookie);
-            try {
-                var val = TaskModel.Create(_func(obj, ref collection));
-                _value = val;
-                _exception = null;
-                return val;
-            }
-            catch (Exception e) {
-                _exception = e;
-                _value = null;
-
-                ExceptionDispatchInfo.Capture(e).Throw();
-                throw;
-            }
-        }
-
-        public TaskModel<TResult> Value {
-            get {
-                if (_exception != null) ExceptionDispatchInfo.Capture(_exception).Throw();
-                return _value!;
-            }
-        }
-    }
-
 
     public interface IDependenciesTarget {
         void SetDependencies(string property, List<(INotifyPropertyChanged Source, string Property, int Cookie)> dependencies,int cookie);
     }
 
     public interface IIsPropertyValid {
-        public bool IsPropertyValid(string name);
+        bool IsPropertyValid(string name);
+        void SetPropertyValid(string name);
     }
 
 
@@ -162,23 +80,17 @@ namespace Iftm.ComputedProperties {
             }
         }
 
-        public static TResult Eval<TObj, TResult>(this ref StoredComputedProperty<TObj, TResult> property, TObj obj, [CallerMemberName] string? name = null) where TObj : IDependenciesTarget, IIsPropertyValid {
+        public static TResult Eval<TObj, TResult>(this ComputedProperty<TObj, TResult> property, TObj obj, ref TResult lastVal, [CallerMemberName] string? name = null) where TObj : IDependenciesTarget, IIsPropertyValid {
             if (name == null) throw new ArgumentNullException(nameof(name));
 
             if (obj.IsPropertyValid(name)) {
-                return property.Value;
+                return lastVal;
             }
             else {
-                var (dependencies, cookie) = ComputedPropertyStorage.GetDependencyStorage();
-                var listEmpty = dependencies.Count == 0;
-                try {
-                    return property.CallAndGetDependencies(obj, dependencies, cookie);
-                }
-                finally {
-                    obj.SetDependencies(name, dependencies, cookie);
-                    RemoveMatchingInputs(dependencies, cookie);
-                    Debug.Assert(!listEmpty || dependencies.Count == 0);
-                }
+                var result = Eval(property, obj, name);
+                lastVal = result;
+                obj.SetPropertyValid(name);
+                return result;
             }
         }
 
@@ -197,25 +109,20 @@ namespace Iftm.ComputedProperties {
             }
         }
 
-        public static TaskModel<TResult> Eval<TObj, TResult>(this ref StoredAsyncProperty<TObj, TResult> property, TObj obj, [CallerMemberName] string? name = null) where TObj : IDependenciesTarget, IIsPropertyValid {
+        public static TaskModel<TResult> Eval<TObj, TResult>(this AsyncProperty<TObj, TResult> property, TObj obj, ref TaskModel<TResult> lastVal, [CallerMemberName] string? name = null) where TObj : IDependenciesTarget, IIsPropertyValid {
             if (name == null) throw new ArgumentNullException(nameof(name));
 
             if (obj.IsPropertyValid(name)) {
-                return property.Value;
+                return lastVal;
             }
             else {
-                var (dependencies, cookie) = ComputedPropertyStorage.GetDependencyStorage();
-                var listEmpty = dependencies.Count == 0;
-                try {
-                    return property.CallAndGetDependencies(obj, dependencies, cookie);
-                }
-                finally {
-                    obj.SetDependencies(name, dependencies, cookie);
-                    RemoveMatchingInputs(dependencies, cookie);
-                    Debug.Assert(!listEmpty || dependencies.Count == 0);
-                }
+                var result = Eval(property, obj, name);
+                lastVal = result;
+                obj.SetPropertyValid(name);
+                return result;
             }
         }
+
 
         private static void RemoveMatchingInputs(List<(INotifyPropertyChanged Source, string Property, int Cookie)> list, int cookie) {
             int writePos = 0;

@@ -37,15 +37,16 @@ namespace Iftm.ComputedProperties.WpfDemo {
             return ret;
         }
 
-        private static AsyncProperty<NuGetModel, IReadOnlyList<IPackageSearchMetadata>> _search = Computed(
-            (NuGetModel model) => Call(model.SearchString, SearchAsync)
+        private static AsyncProperty<NuGetModel, IReadOnlyList<IPackageSearchMetadata>> _searcResults = Computed(
+            (NuGetModel model) => Bind(model.SearchString, SearchAsync)
         );
 
-        private StoredAsyncProperty<NuGetModel, IReadOnlyList<IPackageSearchMetadata>> _searchResults =
-            _search.Stored;
+        #pragma warning disable 8618
+        private TaskModel<IReadOnlyList<IPackageSearchMetadata>> _lastSearchResults;
+        #pragma warning restore 8618
 
         public TaskModel<IReadOnlyList<IPackageSearchMetadata>> SearchResults =>
-            _searchResults.Eval(this);
+            _searcResults.Eval(this, ref _lastSearchResults);
 
         private static ComputedProperty<NuGetModel, Visibility> _searchProgressVisibility = Computed(
             (NuGetModel model) => model.SearchResults.HasValue ? Visibility.Hidden : Visibility.Visible

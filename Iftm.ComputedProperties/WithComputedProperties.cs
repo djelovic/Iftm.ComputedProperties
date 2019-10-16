@@ -336,7 +336,7 @@ namespace Iftm.ComputedProperties {
             RemoveIndices(ref dependencies, toRemove);
         }
 
-        public virtual void SetDependencies(string targetProperty, List<(INotifyPropertyChanged Source, string Property, int Cookie)> input, int cookie) {
+        void IDependenciesTarget.SetDependencies(string targetProperty, List<(INotifyPropertyChanged Source, string Property, int Cookie)> input, int cookie) {
             int inputIndex = -1;
             IncrementInputIndex(ref inputIndex, input, cookie);
 
@@ -378,11 +378,17 @@ namespace Iftm.ComputedProperties {
             }
         }
 
-        protected static Func<CancellationToken, R> Call<R, Arg1>(Arg1 arg1, Func<Arg1, CancellationToken, R> func) =>
+        protected static Func<CancellationToken, R> Bind<R, Arg1>(Arg1 arg1, Func<Arg1, CancellationToken, R> func) =>
             ct => func(arg1, ct);
 
-        protected static Func<CancellationToken, R> Call<R, Arg1, Arg2>(Arg1 arg1, Arg2 arg2, Func<Arg1, Arg2, CancellationToken, R> func) =>
+        protected static Func<CancellationToken, R> Bind<R, Arg1, Arg2>(Arg1 arg1, Arg2 arg2, Func<Arg1, Arg2, CancellationToken, R> func) =>
             ct => func(arg1, arg2, ct);
+
+        protected static Func<CancellationToken, R> Bind<R, Arg1, Arg2, Arg3>(Arg1 arg1, Arg2 arg2, Arg3 arg3, Func<Arg1, Arg2, Arg3, CancellationToken, R> func) =>
+            ct => func(arg1, arg2, arg3, ct);
+
+        protected static Func<CancellationToken, R> Bind<R, Arg1, Arg2, Arg3, Arg4>(Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4, Func<Arg1, Arg2, Arg3, Arg4, CancellationToken, R> func) =>
+            ct => func(arg1, arg2, arg3, arg4, ct);
     }
 
 }

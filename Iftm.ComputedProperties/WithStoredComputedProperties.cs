@@ -28,13 +28,10 @@ namespace Iftm.ComputedProperties {
             base.OnPropertyChanged(name);
         }
 
-        public override void SetDependencies(string targetProperty, List<(INotifyPropertyChanged Source, string Property, int Cookie)> input, int cookie) {
-            if (!_validProperties.Contains(targetProperty)) _validProperties.Add(targetProperty);
-
-            base.SetDependencies(targetProperty, input, cookie);
+        bool IIsPropertyValid.IsPropertyValid(string name) => _validProperties.Contains(name);
+        void IIsPropertyValid.SetPropertyValid(string name) {
+            if (!_validProperties.Contains(name)) _validProperties.Add(name);
         }
-
-        public bool IsPropertyValid(string name) => _validProperties.Contains(name);
     }
 
 }
