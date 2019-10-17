@@ -99,7 +99,7 @@ class Demo : WithCachedProperties {
     public TaskModel<int> B => _b.Eval(this, ref _lastB);
 }
 ```
-Please note that the computation of _b reads the value of the property A and passes it to the AsyncFunction as an argument. This is necessary as 
+Please note that the computation of _b reads the value of the property A and passes it to the AsyncFunction as an argument. This is necessary as the AsyncFunction will execute asynchronously so it would be impossible to determine the dependency chain if it read the properties of our object directly.
 
 ## Performance
 
