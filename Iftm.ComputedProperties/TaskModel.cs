@@ -57,10 +57,10 @@ namespace Iftm.ComputedProperties {
         /// Result of the task. Can throw an exception if the task faulted. Default value of
         /// <see cref="T"/> the task has not completed yet.
         /// </summary>
-        [MaybeNull]
         public T Value {
             get {
                 if (_exception != null) ExceptionDispatchInfo.Capture(_exception).Throw();
+                if (!HasValue) throw new InvalidOperationException("Value not computed yet.");
                 return _value;
             }
         }
@@ -154,5 +154,8 @@ namespace Iftm.ComputedProperties {
 
         public static TaskModel<T> Create<Arg1, Arg2, Arg3, Arg4, T>(Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4, Func<Arg1, Arg2, Arg3, Arg4, CancellationToken, ValueTask<T>> factory) =>
             new TaskModel<T>(ct => factory(arg1, arg2, arg3, arg4, ct));
+
+        public static TaskModel<T> Create<Arg1, Arg2, Arg3, Arg4, Arg5, T>(Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4, Arg5 arg5, Func<Arg1, Arg2, Arg3, Arg4, Arg5, CancellationToken, ValueTask<T>> factory) =>
+            new TaskModel<T>(ct => factory(arg1, arg2, arg3, arg4, arg5, ct));
     }
 }

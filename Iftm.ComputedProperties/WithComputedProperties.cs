@@ -60,9 +60,6 @@ namespace Iftm.ComputedProperties {
         protected static ComputedProperty<TObj, TResult> Computed<TObj, TResult>(Expression<Func<TObj, TResult>> expression) =>
             new ComputedProperty<TObj, TResult>(expression);
 
-        protected static AsyncProperty<TObj, TResult> Computed<TObj, TResult>(Expression<Func<TObj, Func<CancellationToken, ValueTask<TResult>>>> expression) =>
-            new AsyncProperty<TObj, TResult>(expression);
-
         private void AddPropertyWithDependencies(ref InPlaceList<string> properties, int startIndex, string propertyName) {
             if (properties.Contains(propertyName, startIndex, properties.Count - startIndex)) return;
             
@@ -379,18 +376,6 @@ namespace Iftm.ComputedProperties {
                 OnListenersDetached();
             }
         }
-
-        protected static Func<CancellationToken, R> Bind<R, Arg1>(Arg1 arg1, Func<Arg1, CancellationToken, R> func) =>
-            ct => func(arg1, ct);
-
-        protected static Func<CancellationToken, R> Bind<R, Arg1, Arg2>(Arg1 arg1, Arg2 arg2, Func<Arg1, Arg2, CancellationToken, R> func) =>
-            ct => func(arg1, arg2, ct);
-
-        protected static Func<CancellationToken, R> Bind<R, Arg1, Arg2, Arg3>(Arg1 arg1, Arg2 arg2, Arg3 arg3, Func<Arg1, Arg2, Arg3, CancellationToken, R> func) =>
-            ct => func(arg1, arg2, arg3, ct);
-
-        protected static Func<CancellationToken, R> Bind<R, Arg1, Arg2, Arg3, Arg4>(Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4, Func<Arg1, Arg2, Arg3, Arg4, CancellationToken, R> func) =>
-            ct => func(arg1, arg2, arg3, arg4, ct);
     }
 
 }

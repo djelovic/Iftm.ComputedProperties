@@ -49,7 +49,7 @@ To do this simply inherit your model from WithCachedProperties, declare the vari
 ```C#
 using Iftm.ComputedProperties;
 
-class Demo2 : WithCachedProperties {
+class Demo : WithCachedProperties {
     private string _a;
 
     public string A {
@@ -57,15 +57,49 @@ class Demo2 : WithCachedProperties {
         set => SetProperty(ref _a, value); 
     }
 
-    private static readonly ComputedProperty<Demo2, string> _b =
-        Computed((Demo2 obj) => obj.A + " blah blah.");
+    private static readonly ComputedProperty<Demo, string> _b =
+        Computed((Demo obj) => obj.A + " blah blah.");
 
     private string _lastB;
 
     public string B => _b.Eval(this, ref _lastB);
 }
 ```
-(In case you are using C# 8 or later with nullable checks turned on the compiler may complain about _lastB being potentially null in the above example. The call to Eval will never read this property unless it was previously written to so this is a false positive. Either assign an initial value to this field or surround it with #pragma warning for 8618.)
+(In case you are using C# 8 or later with nullable checks turned on the compiler may complain about _lastB being potentially null in the above example. The call to Eval will never read this property unless it was previously written to so this is a false positive. Either assign an initial value to this field or surround it with #nullable disable/restore pragmas.)
+
+## Tasks
+
+In case the value of a property depends on an asynchronous I/O or computation, we provide the TaskModel class that wraps a function CancellationToken → ValueTask&lt;T&gt;. When [PropertyChanged][1] listeners are attached to objects of this class, it calls the provided function to get the property value. If all listeners are detached before the task completes, it cancels the call and then repeats it again if listeners are added later.
+
+The two properties TaskModel&lt;T&gt; are Value, which returns the value of the task if it's been completed, and HasValue which tells us whether the task has been completed. HasValue is useful for displaying a progress indication and for knowing whether Value can be successfully read.
+
+Here is an example:
+
+```C#
+using Iftm.ComputedProperties;
+
+class Demo : WithCachedProperties {
+    private int _a;
+
+    public int A {
+        get => _a;
+        set => SetProperty(ref _a, value);
+    }
+
+    private async static ValueTask<int> AsyncFunction(int num, CancellationToken ct) {
+        await Task.Delay(2_000, ct);
+        return num + 1;
+    }
+
+    private ComputedProperty<Demo, TaskModel<int>> _b =>
+        Computed((Demo obj) => TaskModel.Create(obj.A, AsyncFunction));
+
+    private TaskModel<int> _lastB;
+
+    public TaskModel<int> B => _b.Eval(this, ref _lastB);
+}
+```
+Please note that the computation of _b reads the value of the property A and passes it to the AsyncFunction as an argument. This is necessary as 
 
 ## Performance
 
