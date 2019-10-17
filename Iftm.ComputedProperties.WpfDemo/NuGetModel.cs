@@ -19,7 +19,7 @@ namespace Iftm.ComputedProperties.WpfDemo {
             set => SetProperty(ref _searchString, value);
         }
 
-        private static async ValueTask<IReadOnlyList<IPackageSearchMetadata>> SearchAsync(string searchString, CancellationToken ct) {
+        private static async ValueTask<IEnumerable<IPackageSearchMetadata>> SearchAsync(string searchString, CancellationToken ct) {
             searchString = searchString.Trim();
             if (searchString == "") return Array.Empty<IPackageSearchMetadata>();
 
@@ -33,19 +33,18 @@ namespace Iftm.ComputedProperties.WpfDemo {
             var filter = new SearchFilter(false);
             var resource = await source.GetResourceAsync<PackageSearchResource>().ConfigureAwait(false);
             var metadata = await resource.SearchAsync(searchString, filter, 0, 10, null, ct).ConfigureAwait(false);
-            var ret = metadata.ToList();
-            return ret;
+            return metadata.ToList();
         }
 
-        private static ComputedProperty<NuGetModel, TaskModel<IReadOnlyList<IPackageSearchMetadata>>> _searcResults = Computed(
+        private static ComputedProperty<NuGetModel, TaskModel<IEnumerable<IPackageSearchMetadata>>> _searcResults = Computed(
             (NuGetModel model) => TaskModel.Create(model.SearchString, SearchAsync)
         );
 
         #pragma warning disable 8618
-        private TaskModel<IReadOnlyList<IPackageSearchMetadata>> _lastSearchResults;
+        private TaskModel<IEnumerable<IPackageSearchMetadata>> _lastSearchResults;
         #pragma warning restore 8618
 
-        public TaskModel<IReadOnlyList<IPackageSearchMetadata>> SearchResults =>
+        public TaskModel<IEnumerable<IPackageSearchMetadata>> SearchResults =>
             _searcResults.Eval(this, ref _lastSearchResults);
 
         private static ComputedProperty<NuGetModel, Visibility> _searchProgressVisibility = Computed(
