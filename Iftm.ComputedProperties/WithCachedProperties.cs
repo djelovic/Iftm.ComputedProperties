@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Iftm.ComputedProperties {
 
-    public class WithStoredComputedProperties : WithComputedProperties, IIsPropertyValid {
+    public class WithCachedProperties : WithComputedProperties, IIsPropertyValid {
         private InPlaceList<string> _validProperties;
 
         protected override void OnPropertyChanged(string? name) {

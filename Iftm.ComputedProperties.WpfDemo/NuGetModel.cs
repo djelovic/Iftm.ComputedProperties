@@ -11,7 +11,7 @@ using System.Windows;
 
 namespace Iftm.ComputedProperties.WpfDemo {
 
-    public class NuGetModel : WithStoredComputedProperties {
+    public class NuGetModel : WithCachedProperties {
         private string _searchString = "";
 
         public string SearchString {
