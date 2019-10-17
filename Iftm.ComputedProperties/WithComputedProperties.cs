@@ -38,13 +38,15 @@ namespace Iftm.ComputedProperties {
         /// <param name="destination">Destination.</param>
         /// <param name="source">Source.</param>
         /// <param name="name">Name of the property being set.</param>
-        protected void SetProperty<T>(ref T destination, T source, [CallerMemberName] string? name = null) {
+        protected bool SetProperty<T>(ref T destination, T source, [CallerMemberName] string? name = null) {
             if (name == null) throw new ArgumentNullException(nameof(name));
 
-            if (EqualityComparer<T>.Default.Equals(destination, source)) return;
+            if (EqualityComparer<T>.Default.Equals(destination, source)) return false;
 
             destination = source;
             OnMyPropertyChanged(name);
+
+            return true;
         }
 
 
