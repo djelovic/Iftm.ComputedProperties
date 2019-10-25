@@ -21,7 +21,6 @@ namespace Iftm.ComputedProperties.Test {
             }
 
             Assert.False(tpc.HasValue);
-            Assert.Equal(0, tpc.Value);
 
             tpc.PropertyChanged += OnPropertyChanged;
 
@@ -51,12 +50,10 @@ namespace Iftm.ComputedProperties.Test {
             var tpc = TaskModel.Create(factory);
 
             Assert.False(tpc.HasValue);
-            Assert.Equal(0, tpc.Value);
 
             tpc.PropertyChanged += OnPropertyChanged;
 
             Assert.False(tpc.HasValue);
-            Assert.Equal(0, tpc.Value);
 
             giveResult.Release();
 
@@ -85,17 +82,14 @@ namespace Iftm.ComputedProperties.Test {
             var tpc = TaskModel.Create(factory);
 
             Assert.False(tpc.HasValue);
-            Assert.Equal(0, tpc.Value);
 
             tpc.PropertyChanged += OnPropertyChanged;
 
             Assert.False(tpc.HasValue);
-            Assert.Equal(0, tpc.Value);
 
             tpc.PropertyChanged -= OnPropertyChanged;
 
             Assert.False(tpc.HasValue);
-            Assert.Equal(0, tpc.Value);
 
             giveResult = new SemaphoreSlim(0);
 
