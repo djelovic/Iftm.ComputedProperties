@@ -4,7 +4,7 @@
     <TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
     <LangVersion>8.0</LangVersion>
     <Nullable>enable</Nullable>
-    <Version>1.0.1.0</Version>
+    <Version>1.0.2.0</Version>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -12,14 +12,19 @@
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageIcon>Icon.png</PackageIcon>
-    <Authors>Dejan Jelovic</Authors>
+    <Authors>IFT Management</Authors>
     <Title>Iftm.ComputedProperties</Title>
     <Description>Automatic computed property firing of PropertyChanged events.</Description>
-    <Copyright>Copyright © 2019 Dejan Jelovic</Copyright>
+    <Copyright>Copyright © 2019 IFT Management</Copyright>
     <ProjectUrl>https://github.com/djelovic/Iftm.ComputedProperties/blob/master/README.md</ProjectUrl>
     <RepositoryUrl>https://github.com/djelovic/Iftm.ComputedProperties</RepositoryUrl>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>Iftm.ComputedProperties.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  
   <ItemGroup>
     <None Include="Icon.png" Pack="True" PackagePath="/" />
   </ItemGroup>
