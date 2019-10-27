@@ -52,15 +52,25 @@ namespace Iftm.ComputedProperties {
         /// True if the value of the task has been completed.
         /// </summary>
         public bool HasValue => _factory == null;
-        
+
         /// <summary>
-        /// Result of the task. Can throw an exception if the task faulted. Default value of
-        /// <see cref="T"/> the task has not completed yet.
+        /// Result of the task. Can throw an exception if the task faulted or the task has not completed.
         /// </summary>
         public T Value {
             get {
                 if (_exception != null) ExceptionDispatchInfo.Capture(_exception).Throw();
                 if (!HasValue) throw new InvalidOperationException("Value not computed yet.");
+                return _value;
+            }
+        }
+
+        /// <summary>
+        /// Result of task, or default value of <see cref="T"/> the task has not completed yet.
+        /// </summary>
+        [MaybeNull]
+        public T ValueOrDefault {
+            get {
+                if (_exception != null) ExceptionDispatchInfo.Capture(_exception).Throw();
                 return _value;
             }
         }
