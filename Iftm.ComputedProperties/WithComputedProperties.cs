@@ -19,6 +19,10 @@ namespace Iftm.ComputedProperties {
         [ThreadStatic] private static Dictionary<string, PropertyChangedEventArgs>? _nameToArgs;
         [ThreadStatic] private static InPlaceList<string> _changedProperties;
 
+        public WithComputedProperties() {
+            if (_nameToArgs == null) _nameToArgs = new Dictionary<string, PropertyChangedEventArgs>();
+        }
+
         private struct Dependency {
             public readonly string TargetProperty, SourceProperty;
             public readonly INotifyPropertyChanged? Source; // null if Source == this
@@ -72,45 +76,36 @@ namespace Iftm.ComputedProperties {
             }
         }
 
-        protected virtual void OnPropertyChanged(string? name) {
-            Debug.Assert(_propertyChanged != null);
-            if (_propertyChanged == null) return;
-
-            if (name == null) {
-                _propertyChanged.Invoke(this, AllPropertiesChanged.EventArgs);
-            }
-            else {
-                if (_nameToArgs == null) _nameToArgs = new Dictionary<string, PropertyChangedEventArgs>();
-                var nameToArgs = _nameToArgs;
-
-                if (!nameToArgs.TryGetValue(name, out var args)) {
-                    args = new PropertyChangedEventArgs(name);
-                    nameToArgs.Add(name, args);
-                }
-
-                _propertyChanged!.Invoke(this, args);
-            }
+        protected virtual void OnPropertyChanged(string name) {
         }
 
         private void FirePropertyChanged(ReadOnlySpan<string> names) {
             foreach (var name in names) OnPropertyChanged(name);
+
+            if (_propertyChanged != null) {
+                var nameToArgs = _nameToArgs!;
+
+                foreach (var name in names) {
+                    if (!nameToArgs.TryGetValue(name, out var args)) {
+                        args = new PropertyChangedEventArgs(name);
+                        nameToArgs.Add(name, args);
+                    }
+
+                    _propertyChanged.Invoke(this, args);
+                }
+            }
         }
 
-        private void OnMyPropertyChanged(string? name) {
-            if (name == null) {
-                OnPropertyChanged(null);
-            }
-            else {
-                ref var properties = ref _changedProperties;
-                int startIndex = properties.Count;
+        private void OnMyPropertyChanged(string name) {
+            ref var properties = ref _changedProperties;
+            int startIndex = properties.Count;
 
-                try {
-                    AddPropertyWithDependencies(ref properties, startIndex, name);
-                    FirePropertyChanged(properties.AsReadOnlySpan().Slice(startIndex));
-                }
-                finally {
-                    properties.RemoveRange(startIndex, properties.Count - startIndex);
-                }
+            try {
+                AddPropertyWithDependencies(ref properties, startIndex, name);
+                FirePropertyChanged(properties.AsReadOnlySpan().Slice(startIndex));
+            }
+            finally {
+                properties.RemoveRange(startIndex, properties.Count - startIndex);
             }
         }
 
