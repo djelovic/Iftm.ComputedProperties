@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
@@ -66,7 +67,7 @@ namespace Iftm.ComputedProperties {
             }
         }
 
-        public static TResult Eval<TObj, TResult>(this ComputedProperty<TObj, TResult> property, TObj obj, ref TResult lastVal, [CallerMemberName] string? name = null) where TObj : IDependenciesTarget, IIsPropertyValid {
+        public static TResult Eval<TObj, TResult>(this ComputedProperty<TObj, TResult> property, TObj obj, [AllowNull] ref TResult lastVal, [CallerMemberName] string? name = null) where TObj : IDependenciesTarget, IIsPropertyValid {
             if (name == null) throw new ArgumentNullException(nameof(name));
 
             if (obj.IsPropertyValid(name)) {
@@ -74,9 +75,12 @@ namespace Iftm.ComputedProperties {
             }
             else {
                 var result = Eval(property, obj, name);
-                lastVal = result;
+                if (lastVal == null || !EqualityComparer<TResult>.Default.Equals(lastVal, result)) {
+                    lastVal = result;
+                }
+
                 obj.SetPropertyValid(name);
-                return result;
+                return lastVal;
             }
         }
 

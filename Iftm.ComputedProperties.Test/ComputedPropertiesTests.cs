@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Linq.Expressions;
 using Xunit;
 
 namespace Iftm.ComputedProperties.Test {
@@ -35,6 +36,8 @@ namespace Iftm.ComputedProperties.Test {
             new ExpectChanges(source, expected);
 
         class Test1 : WithComputedProperties {
+            private static ComputedProperty<Test1, T> Computed<T>(Expression<Func<Test1, T>> expression) => new ComputedProperty<Test1, T>(expression);
+
             private int _a;
             public int A {
                 get => _a;
@@ -47,10 +50,10 @@ namespace Iftm.ComputedProperties.Test {
                 set => SetProperty(ref _b, value);
             }
 
-            private static readonly ComputedProperty<Test1, int> _c = Computed((Test1 test) => test.A + 1);
+            private static readonly ComputedProperty<Test1, int> _c = Computed(test => test.A + 1);
             public int C => _c.Eval(this);
 
-            private static readonly ComputedProperty<Test1, int> _d = Computed((Test1 test) => test.B + test.C);
+            private static readonly ComputedProperty<Test1, int> _d = Computed(test => test.B + test.C);
             public int D => _d.Eval(this);
         }
 
