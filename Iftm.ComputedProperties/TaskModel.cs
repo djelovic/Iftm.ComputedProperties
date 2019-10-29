@@ -44,11 +44,11 @@ namespace Iftm.ComputedProperties {
         /// </summary>
         /// <param name="factory">The function that given a <see cref="CancellationToken"/> returns
         /// a <see cref="ValueTask&lt<see cref="T"/>"/>&gt; whose result we are interested in.</param>
-        #pragma warning disable 8618
+        #nullable disable
         public TaskModel(Func<CancellationToken, ValueTask<T>> factory) {
             _factory = factory ?? throw new ArgumentNullException(nameof(factory));
         }
-        #pragma warning restore 8618
+         #nullable restore
 
         /// <summary>
         /// True if the value of the task has been completed.

@@ -65,7 +65,6 @@ class Demo : WithCachedProperties {
     public string B => _b.Eval(this, ref _lastB);
 }
 ```
-(In case you are using C# 8 or later with nullable checks turned on the compiler may complain about _lastB being potentially null in the above example. The call to Eval will never read this property unless it was previously written to so this is a false positive. Either assign an initial value to this field or surround it with #nullable disable/restore pragmas.)
 
 ## Tasks
 
