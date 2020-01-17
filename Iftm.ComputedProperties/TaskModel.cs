@@ -102,6 +102,7 @@ namespace Iftm.ComputedProperties {
             var ct = _cancellation.Token;
 
             try {
+                await Task.Yield();
                 var value = await _factory(ct);
                 ct.ThrowIfCancellationRequested();
 
