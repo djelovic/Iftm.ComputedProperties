@@ -71,7 +71,7 @@ namespace Iftm.ComputedProperties {
             if (name == null) throw new ArgumentNullException(nameof(name));
 
             if (obj.IsPropertyValid(name)) {
-                return lastVal;
+                return lastVal!;
             }
             else {
                 var result = Eval(property, obj, name);

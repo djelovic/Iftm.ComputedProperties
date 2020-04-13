@@ -178,5 +178,11 @@ namespace Iftm.ComputedProperties {
 
         public static TaskModel<T> Create<Arg1, Arg2, Arg3, Arg4, Arg5, T>(Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4, Arg5 arg5, Func<Arg1, Arg2, Arg3, Arg4, Arg5, CancellationToken, ValueTask<T>> factory) =>
             new TaskModel<(Arg1, Arg2, Arg3, Arg4, Arg5, Delegate), T>((arg1, arg2, arg3, arg4, arg5, factory), ct => factory(arg1, arg2, arg3, arg4, arg5, ct));
+
+        public static TaskModel<T> Create<Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, T>(Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4, Arg5 arg5, Arg6 arg6, Func<Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, CancellationToken, ValueTask<T>> factory) =>
+            new TaskModel<(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Delegate), T>((arg1, arg2, arg3, arg4, arg5, arg6, factory), ct => factory(arg1, arg2, arg3, arg4, arg5, arg6, ct));
+
+        public static TaskModel<T> Create<Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, T>(Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4, Arg5 arg5, Arg6 arg6, Arg7 arg7, Func<Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, CancellationToken, ValueTask<T>> factory) =>
+            new TaskModel<(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Delegate), T>((arg1, arg2, arg3, arg4, arg5, arg6, arg7, factory), ct => factory(arg1, arg2, arg3, arg4, arg5, arg6, arg7, ct));
     }
 }
