@@ -4,7 +4,7 @@
     <TargetFrameworks>netstandard2.0;netstandard2.1;net462;net47;net471;net472;net48</TargetFrameworks>
     <LangVersion>8.0</LangVersion>
     <Nullable>enable</Nullable>
-    <Version>1.0.9.0</Version>
+    <Version>1.0.10.0</Version>
   </PropertyGroup>
 
   <PropertyGroup>
