@@ -103,8 +103,9 @@ namespace Iftm.ComputedProperties {
 
             try {
                 await Task.Yield();
+                if (ct.IsCancellationRequested) return; // avoid throwing exceptions if cancelled
                 var value = await _factory(ct);
-                ct.ThrowIfCancellationRequested();
+                if (ct.IsCancellationRequested) return; // avoid throwing exceptions if cancelled
 
                 _value = value;
                 _hasValue = true;
